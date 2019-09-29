@@ -1,0 +1,17 @@
+" y="4px" > <!-- NOFACTOR -->
+				<Panel name="done"       width="30px" height="30px" style="style.page.clipboard" hoverStyle="style.page.clipboard.hovered" />
+			</Button>
+			<Button name="bgprogressinfo_activation"  width="30px" height="30px" x="84px" y="4px">
+				<Panel name="inprogress" width="30px" height="30px" style="style.page.bgscanner.inprogress" hoverStyle="style.page.bgscanner.hovered" />
+				<Panel name="done"       width="30px" height="30px" style="style.page.bgscanner.done"       hoverStyle="style.page.bgscanner.hovered" visible="false" />
+			</Button>
+		</PredefinedPanel>
+		
+		
+		<!-- SetupWizard -->
+		<PredefinedPanel name="setupwizard_content_spacer" width="100%" height="10px">
+			<Panel width="100%" height="100%" />
+		</PredefinedPanel>
+
+		<PredefinedPanel name="setupwizard_content_list" width="100%" height="70px">
+			<HBox width="100%

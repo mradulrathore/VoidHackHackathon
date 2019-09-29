@@ -1,0 +1,264 @@
+                                  <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:choice>
+                        <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                        <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="switches" vs:help="configuration/system.diagnostics/switches">
+                    <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="add" vs:help="configuration/system.diagnostics/switches/add">
+                                <xs:complexType>
+                                    <xs:attribute name="name" type="xs:string" use="required" />
+                                    <xs:attribute name="value" type="xs:string" use="required" />
+                                    <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="remove" vs:help="configuration/system.diagnostics/switches/remove">
+                                <xs:complexType>
+                                    <xs:attribute name="name" type="xs:string" use="required" />
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="clear" vs:help="configuration/system.diagnostics/switches/clear">
+                                <xs:complexType>
+                                    <!--tag is empty-->
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:choice>
+                        <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                        <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="trace" vs:help="configuration/system.diagnostics/trace">
+                    <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="listeners" vs:help="configuration/system.diagnostics/trace/listeners">
+                                <xs:complexType>
+                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element name="add" vs:help="configuration/system.diagnostics/trace/listeners/add">
+                                            <xs:complexType>
+                                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:element name="filter" vs:help="configuration/system.diagnostics/trace/listeners/ListenerElement/filter">
+                                                        <xs:complexType>
+                                                            <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                                            <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                                            <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                                            <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                                                            <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                                                            <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform"
+                                                                processContents="strict"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:choice>
+                                                <xs:attribute name="name" type="xs:string" use="required" />
+                                                <xs:attribute name="traceOutputOptions" use="optional">
+                                                    <xs:simpleType>
+                                                        <xs:union>
+                                                            <xs:simpleType>
+                                                                <xs:restriction base="xs:NMTOKEN">
+                                                                    <xs:enumeration value="Callstack" />
+                                                                    <xs:enumeration value="DateTime" />
+                                                                    <xs:enumeration value="LogicalOperationStack" />
+                                                                    <xs:enumeration value="None" />
+                                                                    <xs:enumeration value="ProcessId" />
+                                                                    <xs:enumeration value="ThreadId" />
+                                                                    <xs:enumeration value="Timestamp" />
+                                                                </xs:restriction>
+                                                            </xs:simpleType>
+                                                            <xs:simpleType>
+                                                                <xs:restriction base="xs:string" />
+                                                            </xs:simpleType>
+                                                        </xs:union>
+                                                    </xs:simpleType>
+                                                </xs:attribute>
+                                                <xs:attribute name="type" type="xs:string" use="optional" />
+                                                <xs:attribute name="initializeData" type="xs:string" use="optional" />
+                                                <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                                <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                                <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                                <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                                                <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                                                <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="remove" vs:help="configuration/system.diagnostics/trace/listeners/remove">
+                                            <xs:complexType>
+                                                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:element name="filter" vs:help="configuration/system.diagnostics/trace/listeners/ListenerElement/filter">
+                                                        <xs:complexType>
+                                                            <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                                            <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                                            <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                                            <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                                                            <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                                                            <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform"
+                                                                processContents="strict"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:choice>
+                                                <xs:attribute name="name" type="xs:string" use="required" />
+                                                <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="clear" vs:help="configuration/system.diagnostics/trace/listeners/clear">
+                                            <xs:complexType>
+                                                <!--tag is empty-->
+                                                <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:choice>
+                                    <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:choice>
+                        <xs:attribute name="autoflush" type="small_boolean_Type" use="optional" />
+                        <xs:attribute name="indentsize" type="xs:int" use="optional" />
+                        <xs:attribute name="useGlobalLock" type="small_boolean_Type" use="optional" />
+                        <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                        <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+            <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+            <xs:attribute name="lockElements" type="xs:string" use="optional" />
+            <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+            <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+            <xs:attribute name="configSource" type="xs:string" use="optional" />
+            <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="system.runtime.remoting" vs:help="configuration/system.runtime.remoting" />
+    <xs:element name="system.windows.forms" vs:help="configuration/system.windows.forms">
+        <xs:complexType>
+            <xs:attribute name="jitDebugging" type="small_boolean_Type" use="optional" />
+            <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+            <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+            <xs:attribute name="lockElements" type="xs:string" use="optional" />
+            <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+            <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+            <xs:attribute name="configSource" type="xs:string" use="optional" />
+            <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="windows" vs:help="configuration/windows" />
+    <xs:element name="system.net" vs:help="configuration/system.net">
+        <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="authenticationModules" vs:help="configuration/system.net/authenticationModules">
+                    <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="add" vs:help="configuration/system.net/authenticationModules/add">
+                                <xs:complexType>
+                                    <xs:attribute name="type" type="xs:string" use="required" />
+                                    <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="remove" vs:help="configuration/system.net/authenticationModules/remove">
+                                <xs:complexType>
+                                    <xs:attribute name="type" type="xs:string" use="required" />
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="clear" vs:help="configuration/system.net/authenticationModules/clear">
+                                <xs:complexType>
+                                    <!--tag is empty-->
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:choice>
+                        <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                        <xs:attribute name="configSource" type="xs:string" use="optional" />
+                        <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="connectionManagement" vs:help="configuration/system.net/connectionManagement">
+                    <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="add" vs:help="configuration/system.net/connectionManagement/add">
+                                <xs:complexType>
+                                    <xs:attribute name="address" type="xs:string" use="required" />
+                                    <xs:attribute name="maxconnection" type="xs:int" use="required" />
+                                    <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                                    <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="remove" vs:help="configuration/system.net/connectionManagement/remove">
+                                <xs:complexType>
+                                    <xs:attribute name="address" type="xs:string" use="required" />
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="clear" vs:help="configuration/system.net/connectionManagement/clear">
+                                <xs:complexType>
+                                    <!--tag is empty-->
+                                    <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:choice>
+                        <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                        <xs:attribute name="lockAllElementsExcept" type="xs:string" use="optional" />
+                        <xs:attribute name="lockItem" type="small_boolean_Type" use="optional" />
+                        <xs:attribute name="configSource" type="xs:string" use="optional" />
+                        <xs:anyAttribute namespace="http://schemas.microsoft.com/XML-Document-Transform" processContents="strict"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="defaultProxy" vs:help="configuration/system.net/defaultProxy">
+                    <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="bypasslist" vs:help="configuration/system.net/defaultProxy/bypasslist">
+                                <xs:complexType>
+                                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                                        <xs:element name="add" vs:help="configuration/system.net/defaultProxy/bypasslist/add">
+                                            <xs:complexType>
+                                                <xs:attribute name="address" type="xs:string" use="required" />
+                                                <xs:attribute name="lockAttributes" type="xs:string" use="optional" />
+                                                <xs:attribute name="lockAllAttributesExcept" type="xs:string" use="optional" />
+                                                <xs:attribute name="lockElements" type="xs:string" use="optional" />
+                                                <xs:attribute name="lockAllE

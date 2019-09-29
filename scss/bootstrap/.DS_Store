@@ -1,0 +1,306 @@
+/***
+* ==++==
+*
+* Copyright (c) Microsoft Corporation. All rights reserved.
+*
+* ==--==
+* =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+*
+* ppltasks.h
+*
+* Parallel Patterns Library - PPL Tasks
+*
+* =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+****/
+#pragma once
+
+#ifndef _PPLTASKS_H
+#define _PPLTASKS_H
+#include <pplwin.h>
+
+#include <functional>
+#include <vector>
+#include <utility>
+#include <exception>
+#include <algorithm>
+#include <mutex>
+#include <intrin.h>
+
+#if defined (__cplusplus_winrt)
+#include <agile.h>
+#endif /* #if defined(__cplusplus_winrt) */
+
+#ifdef _DEBUG
+    #define _DBG_ONLY(X) X
+#else
+    #define _DBG_ONLY(X)
+#endif // #ifdef _DEBUG
+
+#ifndef _PPLTASK_ASYNC_LOGGING
+#define _PPLTASK_ASYNC_LOGGING 1
+#endif // #ifndef _PPLTASK_ASYNC_LOGGING
+
+// Enforce consistent task definitions across clients
+#if _PPLTASK_ASYNC_LOGGING
+#pragma detect_mismatch("_PPLTASK_ASYNC_LOGGING", "1")
+#else
+#pragma detect_mismatch("_PPLTASK_ASYNC_LOGGING", "0")
+#endif // #if _PPLTASK_ASYNC_LOGGING
+
+#if defined(PPL_TASK_CONTEXT_ERROR_CONTROL) || defined (__cplusplus_winrt)
+#define _PPL_TASK_CONTEXT_CONTROL_ENABLED true
+#else
+#define _PPL_TASK_CONTEXT_CONTROL_ENABLED false
+#endif
+#if defined(PPL_TASK_CONTEXT_ERROR_CONTROL)
+#define _PPL_TASK_ERROR_REPORT_ENABLED true
+#else
+#define _PPL_TASK_ERROR_REPORT_ENABLED false
+#endif
+
+#pragma pack(push,_CRT_PACKING)
+
+#pragma warning(push)
+#pragma warning(disable: 28197)
+#pragma warning(disable: 4100) // Unreferenced formal parameter - needed for document generation
+#pragma warning(disable: 4127) // constant express in if condition - we use it for meta programming
+
+// All CRT public header files are required to be protected from the macro new
+#pragma push_macro("new")
+#undef new
+
+// stuff ported from Dev11 CRT
+// NOTE: this doesn't actually match std::declval. it behaves differently for void!
+// so don't blindly change it to std::declval.
+namespace Concurrency
+{
+    namespace details
+    {
+        template<class _Ty>
+        _Ty&& declval();
+    }
+}
+
+/// <summary>
+///     The <c>Concurrency</c> namespace provides classes and functions that give you access to the Concurrency Runtime,
+///     a concurrent programming framework for C++. For more information, see <see cref="Concurrency Runtime"/>.
+/// </summary>
+/**/
+namespace Concurrency
+{
+/// <summary>
+///     A type that represents the terminal state of a task. Valid values are <c>completed</c> and <c>canceled</c>.
+/// </summary>
+/// <seealso cref="task Class"/>
+/**/
+typedef task_group_status task_status;
+
+template <typename _Type> class task;
+template <> class task<void>;
+
+// In debug builds, default to 10 frames, unless this is overridden prior to #include'ing ppltasks.h.  In retail builds, default to only one frame.
+#ifndef PPL_TASK_SAVE_FRAME_COUNT
+#ifdef _DEBUG
+#define PPL_TASK_SAVE_FRAME_COUNT 10
+#else
+#define PPL_TASK_SAVE_FRAME_COUNT 1
+#endif
+#endif
+
+#ifndef __EDG__
+#define _EXPAND_STR(x) #x
+// Enforce consistent task frame save count across clients
+#pragma detect_mismatch("ppltask_saved_frame_numbers", _EXPAND_STR(PPL_TASK_SAVE_FRAME_COUNT))
+#undef _EXPAND_STR
+#endif
+
+/// <summary>
+/// Helper macro to determine how many stack frames need to be saved. When any number less or equal to 1 is specified,
+/// only one frame is captured and no stackwalk will be involved. Otherwise, the number of callstack frames will be captured.
+/// </summary>
+/// <remarks>
+/// This needs to be defined as a macro rather than a function so that if we're only gathering one frame, _ReturnAddress()
+/// will evaluate to client code, rather than a helper function inside of _TaskCreationCallstack, itself.
+/// </remarks>
+#if PPL_TASK_SAVE_FRAME_COUNT > 1
+#if defined(__cplusplus_winrt) && !defined(_DEBUG)
+#pragma message ("WARNING: Redefining PPL_TASK_SAVE_FRAME_COUNT under Release build for non-desktop applications is not supported; only one frame will be captured!")
+#endif
+#define _CAPTURE_CALLSTACK() ::Concurrency::details::_TaskCreationCallstack::_CaptureMultiFramesCallstack(_ReturnAddress(), PPL_TASK_SAVE_FRAME_COUNT)
+#else
+#define _CAPTURE_CALLSTACK() ::Concurrency::details::_TaskCreationCallstack::_CaptureSingleFrameCallstack(_ReturnAddress())
+#endif
+
+
+/// <summary>
+///     Cancels the currently executing task. This function can be called from within the body of a task to abort the
+///     task's execution and cause it to enter the <c>canceled</c> state. While it may be used in response to
+///     a cancellation request through a <c>cancellation_token</c>, you may also use it by itself, to initiate
+///     cancellation of the task that is currently executing.
+///     <para>It is not a supported scenario to call this function if you are not within the body of a <c>task</c>.
+///     Doing so will result in undefined behavior such as a crash or a hang in your application.</para>
+/// </summary>
+/// <seealso cref="task Class"/>
+/**/
+inline __declspec(noreturn) void __cdecl cancel_current_task()
+{
+#ifdef BUILD_WINDOWS
+    _THROW(task_canceled, _EMPTY_ARGUMENT);
+#else
+    _THROW(task_canceled{});
+#endif
+}
+
+namespace details
+{
+    struct _DefaultTaskHelper
+    {
+        /// <summary>
+        /// Helper function for throwing an error for task functions that cannot be called
+        /// from a default constructed task.
+        /// </summary>
+        static void __declspec(noreturn) __cdecl _NoCallOnDefaultTask_ErrorImpl()
+        {
+#ifdef BUILD_WINDOWS
+            _THROW(invalid_operation, "This function cannot be called on a default constructed task");
+#else
+            _THROW(invalid_operation("This function cannot be called on a default constructed task"));
+#endif
+        }
+    };
+
+    /// <summary>
+    ///     Callstack container, which is used to capture and preserve callstacks in ppltasks.
+    ///     Members of this class is examined by vc debugger, thus there will be no public access methods.
+    ///     Please note that names of this class should be kept stable for debugger examining.
+    /// </summary>
+    class _TaskCreationCallstack
+    {
+    private:
+        // If _M_SingleFrame != nullptr, there will be only one frame of callstacks, which is stored in _M_SingleFrame;
+        // otherwise, _M_Frame will store all the callstack frames.
+        void* _M_SingleFrame;
+        std::vector<void *> _M_frames;
+    public:
+        _TaskCreationCallstack()
+        {
+            _M_SingleFrame = nullptr;
+        }
+
+        // Store one frame of callstack. This function works for both Debug / Release CRT.
+        static _TaskCreationCallstack _CaptureSingleFrameCallstack(void *_SingleFrame)
+        {
+            _TaskCreationCallstack _csc;
+            _csc._M_SingleFrame = _SingleFrame;
+            return _csc;
+        }
+
+        // Capture _CaptureFrames number of callstack frames. This function only work properly for Desktop or Debug CRT.
+        __declspec(noinline)
+        static _TaskCreationCallstack _CaptureMultiFramesCallstack(void *_SingleFrame, size_t _CaptureFrames)
+        {
+            _TaskCreationCallstack _csc;
+            _csc._M_SingleFrame = _SingleFrame;
+            if (_CaptureFrames > 1)
+            {
+            _csc._M_frames.resize(_CaptureFrames);
+            // skip 2 frames to make sure callstack starts from user code
+            _csc._M_frames.resize(::Concurrency::details::platform::CaptureCallstack(&_csc._M_frames[0], 2, _CaptureFrames));
+            }
+            return _csc;
+        }
+    };
+    typedef unsigned char _Unit_type;
+
+    struct _TypeSelectorNoAsync {};
+    struct _TypeSelectorAsyncOperationOrTask {};
+    struct _TypeSelectorAsyncOperation : public _TypeSelectorAsyncOperationOrTask { };
+    struct _TypeSelectorAsyncTask : public _TypeSelectorAsyncOperationOrTask { };
+    struct _TypeSelectorAsyncAction {};
+    struct _TypeSelectorAsyncActionWithProgress {};
+    struct _TypeSelectorAsyncOperationWithProgress {};
+
+    template<typename _Ty>
+    struct _NormalizeVoidToUnitType
+    {
+        typedef _Ty _Type;
+    };
+
+    template<>
+    struct _NormalizeVoidToUnitType<void>
+    {
+        typedef _Unit_type _Type;
+    };
+
+    template<typename _Ty>
+    struct _IsUnwrappedAsyncSelector
+    {
+        static const bool _Value = true;
+    };
+
+    template<>
+    struct _IsUnwrappedAsyncSelector<_TypeSelectorNoAsync>
+    {
+        static const bool _Value = false;
+    };
+
+    template <typename _Ty>
+    struct _UnwrapTaskType
+    {
+        typedef _Ty _Type;
+    };
+
+    template <typename _Ty>
+    struct _UnwrapTaskType<task<_Ty>>
+    {
+        typedef _Ty _Type;
+    };
+
+    template <typename _Ty>
+    _TypeSelectorAsyncTask _AsyncOperationKindSelector(task<_Ty>);
+
+    _TypeSelectorNoAsync _AsyncOperationKindSelector(...);
+
+#if defined(__cplusplus_winrt)
+    template <typename _Type>
+    struct _Unhat
+    {
+        typedef _Type _Value;
+    };
+
+    template <typename _Type>
+    struct _Unhat<_Type^>
+    {
+        typedef _Type _Value;
+    };
+
+    value struct _NonUserType { public: int _Dummy; };
+
+    template <typename _Type, bool _IsValueTypeOrRefType = __is_valid_winrt_type(_Type)>
+    struct _ValueTypeOrRefType
+    {
+        typedef _NonUserType _Value;
+    };
+
+    template <typename _Type>
+    struct _ValueTypeOrRefType<_Type, true>
+    {
+        typedef _Type _Value;
+    };
+
+    template <typename _T1, typename _T2>
+    _T2 _ProgressTypeSelector(Windows::Foundation::IAsyncOperationWithProgress<_T1,_T2>^);
+
+    template <typename _T1>
+    _T1 _ProgressTypeSelector(Windows::Foundation::IAsyncActionWithProgress<_T1>^);
+
+    template <typename _Type>
+    struct _GetProgressType
+    {
+        typedef decltype(_ProgressTypeSelector(details::declval<_Type>())) _Value;
+    };
+
+    template <typename _Type>
+    struct _IsIAsyncInfo
+    {
+        static const bool _Value = __is_base_of(Windows::Foundation::IAsyncInfo, typename _Unhat<_Type>::_Va

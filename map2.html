@@ -1,0 +1,51 @@
+<!Doctype html>
+<html lang="en">
+<title>Geolocation</title>
+<head>
+  <style>
+body{
+  background-color: #FFDF00;
+}
+  </style>
+</head>
+<body background="yellow">
+<h1>Hello let's trace your location</h1>
+<button onclick="getlocation()"> Get Location </button>
+<div id="output"></div>
+<script src="http://code.jquery.com/jquery-2.2.4.min.js"
+  ></script>
+ <script>
+ var x = document.getElementById('output');
+
+ function getlocation(){
+ if(navigator.geolocation){
+ navigator.geolocation.getCurrentPosition(showPosition);
+
+ }else{
+ x.innerHTML = "Browser not Supporting";}}
+function showPosition(position){
+x.innerHTML = "latitude = "+position.coords.latitude;
+x.innerHTML += "<br />"
+x.innerHTML += "longitude = "+position.coords.longitude;
+var locAPI = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+position.coords.latitude+","+position.coords.longitude+"&key=AIzaSyBPuWmI65hc4PFIKM-Ylym-4ykwwlohg9k";
+$.get({
+url : locAPI,
+success: function(data){
+console.log(data);
+x.innerHTML = data.results[0].address_components[0].long_name;
+x.innerHTML += data.results[0].address_components[1].long_name+" ";
+x.innerHTML += data.results[0].address_components[2].long_name+" ";
+x.innerHTML += data.results[0].address_components[3].long_name+" ";
+x.innerHTML += data.results[0].address_components[4].long_name+" ";
+}});
+}
+ </script>
+
+
+
+
+
+
+
+</body>
+</html>
